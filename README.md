@@ -17,32 +17,56 @@ Web UI is there to test the conversations
 
 ## Quick Start
 
-### 1. Install Dependencies
+### 🚀 **Automated Installation (Recommended)**
+
+**Linux/macOS:**
 ```bash
-cd backend
+chmod +x install.sh
+./install.sh
+```
+
+**Windows:**
+```batch
+install.bat
+```
+
+The installation script will:
+- ✅ Check Python requirements
+- ✅ Install all dependencies
+- ✅ Create necessary directories
+- ✅ Set up environment configuration
+- ✅ Provide model download instructions
+- ✅ Test the installation
+
+### 📋 **Manual Installation**
+
+If you prefer manual setup:
+
+#### 1. Install Dependencies
+```bash
 pip install -r requirements.txt
 ```
 
-### 2. Download LLaMA Model
+#### 2. Download LLaMA Model
 ```bash
 mkdir -p models
 # Download a 4GB model (recommended for testing)
 wget https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF/resolve/main/llama-2-7b-chat.Q4_K_M.gguf -O models/llama-2-7b-chat.q4.gguf
 ```
 
-### 3. Configure Environment
+#### 3. Configure Environment
 ```bash
 # Create .env file in backend directory
-echo "MODEL_PATH=/absolute/path/to/your/models/llama-2-7b-chat.q4.gguf" > .env
+echo "MODEL_PATH=./models/llama-2-7b-chat.q4.gguf" > backend/.env
 ```
 
-### 4. Start the Server
+#### 4. Start the Server
 ```bash
 cd backend
 uvicorn app:app --reload
 ```
 
-### 5. Open Web Interface
+#### 5. Open Web Interface
 Navigate to `http://localhost:8000` in your browser.
 
 ## How It Works
