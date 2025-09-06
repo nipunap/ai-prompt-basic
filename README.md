@@ -94,4 +94,4 @@ TOP_P=0.95
 
 ## License
 
-MIT License
+GNU v3 License
