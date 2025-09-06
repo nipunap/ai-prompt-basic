@@ -11,6 +11,10 @@ A web-based AI chat application powered by LLaMA with intelligent conversation m
 - 🌐 **Modern web interface** with glassmorphism design
 - ⚡ **Real-time responses** via FastAPI backend
 
+Web UI is there to test the conversations
+<img width="1102" height="689" alt="image" src="https://github.com/user-attachments/assets/e2407520-fa9d-4919-9b21-f104e4ba795a" />
+
+
 ## Quick Start
 
 ### 1. Install Dependencies
