@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Conversation Memory - Modern Interface</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #f8fafc;
+            --accent: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-light: #9ca3af;
+            --border: #e5e7eb;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --radius: 12px;
+            --radius-lg: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            margin-bottom: 24px;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 24px;
+            flex: 1;
+        }
+
+        .chat-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            height: 600px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+            border-radius: 3px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message-content {
+            max-width: 80%;
+            padding: 16px 20px;
+            border-radius: var(--radius);
+            position: relative;
+            word-wrap: break-word;
+        }
+
+        .message.user {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border-bottom-right-radius: 6px;
+        }
+
+        .message.ai {
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        .message.ai .message-content {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            border-bottom-left-radius: 6px;
+        }
+
+        .message-meta {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .chat-input {
+            padding: 24px;
+            border-top: 1px solid var(--border);
+            background: var(--bg-primary);
+            border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+        }
+
+        .input-container {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            font-family: inherit;
+            font-size: 1rem;
+            resize: none;
+            transition: all 0.2s ease;
+            background: var(--bg-primary);
+            min-height: 56px;
+            max-height: 120px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .btn {
+            padding: 16px 24px;
+            border: none;
+            border-radius: var(--radius);
+            font-family: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            background: var(--bg-secondary);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            margin-bottom: 16px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 12px;
+            background: var(--bg-secondary);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            padding: 16px 20px;
+            color: var(--text-light);
+            font-style: italic;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--text-light);
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .container {
+                padding: 12px;
+            }
+
+            .chat-container {
+                height: 500px;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Session ID clickable styles */
+        #sessionId:hover {
+            background: var(--primary) !important;
+            color: white !important;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow);
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: var(--bg-primary);
+            margin: 5% auto;
+            padding: 0;
+            border-radius: var(--radius-lg);
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            animation: slideIn 0.3s ease;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: background 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-body {
+            padding: 24px;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .summary-content {
+            line-height: 1.6;
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .summary-meta {
+            background: var(--bg-secondary);
+            padding: 16px;
+            border-radius: var(--radius);
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            font-size: 0.9rem;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .meta-value {
+            color: var(--text-primary);
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container fade-in">
+        <div class="header">
+            <h1><i class="fas fa-brain"></i> AI Conversation Memory</h1>
+            <p>Intelligent conversations with persistent memory and context awareness</p>
+        </div>
+
+        <div class="main-content">
+            <div class="chat-container">
+                <div class="chat-messages" id="messages">
+                    <div class="message ai">
+                        <div class="message-content">
+                            <strong><i class="fas fa-robot"></i> AI Assistant</strong><br>
+                            Hello! I'm your AI assistant with advanced conversation memory. I'll remember our entire conversation and build intelligent summaries to maintain context. Ask me anything!
+                        </div>
+                        <div class="message-meta">
+                            <i class="fas fa-clock"></i> Just now
+                        </div>
+                    </div>
+                </div>
+
+                <div class="typing-indicator" id="typingIndicator">
+                    <i class="fas fa-robot"></i>
+                    <span>AI is thinking</span>
+                    <div class="typing-dots">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+
+                <div class="chat-input">
+                    <div class="input-container">
+                        <div class="input-wrapper">
+                            <textarea
+                                id="prompt"
+                                placeholder="Type your message here... (Press Enter to send, Shift+Enter for new line)"
+                                rows="1"
+                            ></textarea>
+                        </div>
+                        <button class="btn btn-primary" onclick="sendMessage()" id="sendBtn">
+                            <i class="fas fa-paper-plane"></i>
+                            Send
+                        </button>
+                        <button class="btn btn-secondary" onclick="clearConversation()">
+                            <i class="fas fa-refresh"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="card">
+                    <h3><i class="fas fa-memory"></i> Session Status</h3>
+                    <div class="status-indicator">
+                        <div class="status-dot"></div>
+                        <span>Memory Active</span>
+                    </div>
+                    <div style="font-size: 0.9rem; color: var(--text-secondary);">
+                        <strong>Session ID:</strong><br>
+                        <code id="sessionId" style="font-size: 0.8rem; background: var(--bg-secondary); padding: 4px 8px; border-radius: 4px; display: inline-block; margin-top: 4px; cursor: pointer; transition: all 0.2s ease;" onclick="showSessionSummary()" title="Click to view conversation summary">Loading...</code>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3><i class="fas fa-chart-line"></i> Statistics</h3>
+                    <div class="stats-grid" id="statsGrid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="totalMessages">0</div>
+                            <div class="stat-label">Messages</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="totalSessions">0</div>
+                            <div class="stat-label">Sessions</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="messagesToday">0</div>
+                            <div class="stat-label">Today</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="contextUsage">0%</div>
+                            <div class="stat-label">Context</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary" onclick="loadStats()" style="width: 100%;">
+                        <i class="fas fa-sync-alt"></i>
+                        Refresh Stats
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let sessionId = 'web_session_' + Date.now();
+        let messageCount = 0;
+
+        // Initialize
+        document.getElementById('sessionId').textContent = sessionId;
+        loadStats();
+
+        // Auto-resize textarea
+        const textarea = document.getElementById('prompt');
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
+
+        async function sendMessage() {
+            const prompt = document.getElementById('prompt').value.trim();
+            if (!prompt) return;
+
+            const sendBtn = document.getElementById('sendBtn');
+            const typingIndicator = document.getElementById('typingIndicator');
+
+            // Disable send button and show typing
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            typingIndicator.style.display = 'flex';
+
+            // Add user message
+            addMessage(prompt, 'user');
+            document.getElementById('prompt').value = '';
+            textarea.style.height = 'auto';
+
+            try {
+                const response = await fetch('/api/prompt', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        prompt: prompt,
+                        session_id: sessionId,
+                        use_context: true
+                    })
+                });
+
+                const data = await response.json();
+
+                // Hide typing indicator
+                typingIndicator.style.display = 'none';
+
+                // Add AI response
+                addMessage(data.response, 'ai', data.conversation_id);
+
+            } catch (error) {
+                typingIndicator.style.display = 'none';
+                addMessage('Sorry, there was an error processing your request. Please try again.', 'ai', null, true);
+            }
+
+            // Re-enable send button
+            sendBtn.disabled = false;
+            sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send';
+
+            // Update stats
+            loadStats();
+        }
+
+        function addMessage(text, type, conversationId = null, isError = false) {
+            const messagesDiv = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message ' + type;
+
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+            let icon = type === 'user' ? 'fas fa-user' : 'fas fa-robot';
+            let label = type === 'user' ? 'You' : 'AI Assistant';
+
+            if (isError) {
+                icon = 'fas fa-exclamation-triangle';
+                label = 'Error';
+            }
+
+            messageDiv.innerHTML = `
+                <div class="message-content">
+                    <strong><i class="${icon}"></i> ${label}</strong><br>
+                    ${text}
+                </div>
+                <div class="message-meta">
+                    <i class="fas fa-clock"></i> ${timeStr}
+                    ${conversationId ? `<span style="margin-left: 8px;"><i class="fas fa-memory"></i> #${conversationId}</span>` : ''}
+                </div>
+            `;
+
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            messageCount++;
+        }
+
+        function clearConversation() {
+            // Generate new session ID
+            sessionId = 'web_session_' + Date.now();
+            document.getElementById('sessionId').textContent = sessionId;
+            messageCount = 0;
+
+            // Clear messages
+            const messagesDiv = document.getElementById('messages');
+            messagesDiv.innerHTML = `
+                <div class="message ai">
+                    <div class="message-content">
+                        <strong><i class="fas fa-robot"></i> AI Assistant</strong><br>
+                        Hello! I'm your AI assistant with advanced conversation memory. I'll remember our entire conversation and build intelligent summaries to maintain context. Ask me anything!
+                    </div>
+                    <div class="message-meta">
+                        <i class="fas fa-clock"></i> Just now
+                    </div>
+                </div>
+            `;
+
+            // Add new session message
+            setTimeout(() => {
+                addMessage('New conversation started! Previous context has been cleared.', 'ai');
+            }, 500);
+        }
+
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/stats');
+                const stats = await response.json();
+
+                document.getElementById('totalMessages').textContent = stats.total_conversations || 0;
+                document.getElementById('totalSessions').textContent = stats.total_sessions || 0;
+                document.getElementById('messagesToday').textContent = stats.messages_today || 0;
+                document.getElementById('contextUsage').textContent = (stats.context_usage_rate || 0) + '%';
+
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // Keyboard shortcuts
+        document.getElementById('prompt').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // Auto-refresh stats every 30 seconds
+        setInterval(loadStats, 30000);
+
+        // Session Summary Modal Functions
+        async function showSessionSummary() {
+            const modal = document.getElementById('summaryModal');
+            const loading = document.getElementById('summaryLoading');
+            const content = document.getElementById('summaryContent');
+            const error = document.getElementById('summaryError');
+
+            // Show modal and loading state
+            modal.style.display = 'block';
+            loading.style.display = 'block';
+            content.style.display = 'none';
+            error.style.display = 'none';
+
+            try {
+                const response = await fetch(`/api/session/${sessionId}/summary`);
+                const data = await response.json();
+
+                if (response.ok && data.summary) {
+                    // Populate meta information
+                    const metaHtml = `
+                        <div class="meta-item">
+                            <div class="meta-label">Session ID</div>
+                            <div class="meta-value">${data.session_id}</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Messages</div>
+                            <div class="meta-value">${data.message_count} messages</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Summary Length</div>
+                            <div class="meta-value">${data.summary.split(' ').length} words</div>
+                        </div>
+                    `;
+                    document.getElementById('summaryMeta').innerHTML = metaHtml;
+
+                    // Populate summary text
+                    document.getElementById('summaryText').innerHTML = `
+                        <h3 style="margin-bottom: 16px; color: var(--text-primary);">
+                            <i class="fas fa-brain"></i> AI-Generated Summary
+                        </h3>
+                        <p style="white-space: pre-wrap;">${data.summary}</p>
+                    `;
+
+                    // Show content
+                    loading.style.display = 'none';
+                    content.style.display = 'block';
+                } else {
+                    throw new Error('No summary available');
+                }
+            } catch (err) {
+                console.error('Error loading summary:', err);
+                loading.style.display = 'none';
+                error.style.display = 'block';
+            }
+        }
+
+        function closeSummaryModal() {
+            document.getElementById('summaryModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('summaryModal');
+            if (event.target === modal) {
+                closeSummaryModal();
+            }
+        }
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeSummaryModal();
+            }
+        });
+    </script>
+
+    <!-- Session Summary Modal -->
+    <div id="summaryModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-file-alt"></i> Conversation Summary</h2>
+                <button class="modal-close" onclick="closeSummaryModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="summaryLoading" style="text-align: center; padding: 40px;">
+                    <div class="loading-spinner"></div>
+                    <p style="margin-top: 16px; color: var(--text-secondary);">Loading conversation summary...</p>
+                </div>
+                <div id="summaryContent" style="display: none;">
+                    <div class="summary-meta" id="summaryMeta">
+                        <!-- Meta information will be populated here -->
+                    </div>
+                    <div class="summary-content" id="summaryText">
+                        <!-- Summary text will be populated here -->
+                    </div>
+                </div>
+                <div id="summaryError" style="display: none; text-align: center; padding: 40px;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: var(--warning); margin-bottom: 16px;"></i>
+                    <p style="color: var(--text-secondary);">Unable to load conversation summary. This might be a new session or there may be no messages yet.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
